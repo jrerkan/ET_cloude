@@ -1,0 +1,17 @@
+ETAP Kilit - Harici Karekod Sayfası
+==================================
+
+1) Bu klasördeki dosyaların hepsini (kod.php, config.php, .htaccess) PHP 7.3+ destekli web sitenize yükleyin.
+   Örnek: https://okulunuz.com/etap/   -> sayfa adresi: https://okulunuz.com/etap/kod.php
+   HTTPS kullanmanız önerilir.
+2) Ana programda  Yetkilendirme > Karekod sayfası  bölümünde "Harici web sitesi" seçip
+   bu adresi (https://okulunuz.com/etap/kod.php) yazın ve Kaydet'e basın.
+3) "Test bağlantısını aç" ile sayfanın açıldığını kontrol edin.
+4) Öğretmen kodunu, okul adını, geçerlilik süresini değiştirir veya "Kayıtlı telefonları sıfırla" derseniz
+   dışa aktarmayı yeniden yapıp yalnızca config.php dosyasını yeniden yüklemeniz gerekir.
+
+GÜVENLİK
+- config.php içindeki gizli anahtarı kimseyle paylaşmayın.
+- Harici sunucu yalnızca kodu hesaplar; tahtalarla veya ana programla doğrudan bağlantı kurmaz.
+  Ana program kodu kendi içinde aynı formülle doğrular, bu yüzden internet kesilse bile
+  (telefonun sayfaya erişebildiği sürece) doğrulama çalışır.
