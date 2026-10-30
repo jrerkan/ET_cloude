@@ -1,0 +1,4 @@
+PyQt5>=5.15
+aiohttp>=3.9
+mss>=9.0
+pillow>=10.0
