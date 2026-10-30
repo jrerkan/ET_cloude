@@ -1,0 +1,61 @@
+name: Windows Kurulum Dosyası
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: windows/requirements.txt
+
+      - name: Bağımlılıkları kur
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r windows/requirements.txt pyinstaller
+
+      - name: Uygulama simgesi üret
+        run: python tools/make_icon.py
+
+      - name: Sürüm belirle
+        id: ver
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then V="${GITHUB_REF_NAME#v}"; else V="1.0.${GITHUB_RUN_NUMBER}"; fi
+          echo "v=$V" >> "$GITHUB_OUTPUT"
+
+      - name: PyInstaller ile derle
+        run: >
+          pyinstaller --noconfirm --windowed --name ETAPKilit --icon assets/app.ico
+          --add-data "client/etap_client.py;client_src"
+          --hidden-import mss.windows
+          windows/app.py
+
+      - name: Inno Setup ile kurulum dosyası oluştur
+        run: |
+          choco install innosetup -y --no-progress
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=${{ steps.ver.outputs.v }}" installer\setup.iss
+
+      - name: Kurulum dosyasını yükle
+        uses: actions/upload-artifact@v4
+        with:
+          name: ETAPKilit-Kurulum
+          path: installer/Output/*.exe
+
+      - name: Sürüm yayınla (etiketli gönderimlerde)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: installer/Output/*.exe
